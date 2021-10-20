@@ -6,7 +6,10 @@ import { isFunction } from 'util';
 import { CommandBus } from './command-bus';
 import { EVENTS_HANDLER_METADATA, SAGA_METADATA } from './decorators/constants';
 import { InvalidSagaException } from './exceptions';
-import { defaultGetEventName } from './helpers/default-get-event-name';
+import {
+  defaultGetEventId,
+  defaultReflectEventId,
+} from './helpers/default-get-event-id';
 import { DefaultPubSub } from './helpers/default-pubsub';
 import {
   IEvent,
@@ -26,7 +29,7 @@ export class EventBus<EventBase extends IEvent = IEvent>
   extends ObservableBus<EventBase>
   implements IEventBus<EventBase>, OnModuleDestroy
 {
-  protected getEventName: (event: EventBase) => string;
+  protected getEventId: (event: EventBase) => string;
   protected readonly subscriptions: Subscription[];
 
   private _publisher: IEventPublisher<EventBase>;
@@ -37,7 +40,7 @@ export class EventBus<EventBase extends IEvent = IEvent>
   ) {
     super();
     this.subscriptions = [];
-    this.getEventName = defaultGetEventName;
+    this.getEventId = defaultGetEventId;
     this.useDefaultPublisher();
   }
 
@@ -64,8 +67,8 @@ export class EventBus<EventBase extends IEvent = IEvent>
     return (events || []).map((event) => this._publisher.publish(event));
   }
 
-  bind(handler: IEventHandler<EventBase>, name: string) {
-    const stream$ = name ? this.ofEventName(name) : this.subject$;
+  bind(handler: IEventHandler<EventBase>, id: string) {
+    const stream$ = id ? this.ofEventId(id) : this.subject$;
     const subscription = stream$.subscribe((event) => handler.handle(event));
     this.subscriptions.push(subscription);
   }
@@ -94,16 +97,17 @@ export class EventBus<EventBase extends IEvent = IEvent>
     if (!instance) {
       return;
     }
-    const eventsNames = this.reflectEventsNames(handler);
-    eventsNames.map((event) =>
-      this.bind(instance as IEventHandler<EventBase>, event.name),
+    const events = this.reflectEvents(handler);
+    events.map((event) =>
+      this.bind(
+        instance as IEventHandler<EventBase>,
+        defaultReflectEventId(event),
+      ),
     );
   }
 
-  protected ofEventName(name: string) {
-    return this.subject$.pipe(
-      filter((event) => this.getEventName(event) === name),
-    );
+  protected ofEventId(id: string) {
+    return this.subject$.pipe(filter((event) => this.getEventId(event) === id));
   }
 
   protected registerSaga(saga: ISaga<EventBase>) {
@@ -122,7 +126,7 @@ export class EventBus<EventBase extends IEvent = IEvent>
     this.subscriptions.push(subscription);
   }
 
-  private reflectEventsNames(
+  private reflectEvents(
     handler: EventHandlerType<EventBase>,
   ): FunctionConstructor[] {
     return Reflect.getMetadata(EVENTS_HANDLER_METADATA, handler);
