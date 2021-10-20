@@ -14,4 +14,10 @@ describe('Query Bus', () => {
     const result = await fixtures.WhenTheQueryIsExecuted();
     fixtures.ThenItShouldReturnTheResultFromHandler(result);
   });
+
+  it('should be impossible to register multiple handlers to the same command', async () => {
+    const result =
+      await fixtures.WhenAssigningMultipleHandlersForTheSameAction();
+    fixtures.ThenItShouldProduceAnError(result);
+  });
 });
