@@ -4,7 +4,7 @@ import 'reflect-metadata';
 import { COMMAND_HANDLER_METADATA } from './decorators/constants';
 import { CommandHandlerNotFoundException } from './exceptions/command-not-found.exception';
 import { DefaultCommandPubSub } from './helpers/default-command-pubsub';
-import { InvalidCommandHandlerException } from './index';
+import { InvalidCommandHandlerException } from './exceptions/invalid-command-handler.exception';
 import {
   ICommand,
   ICommandBus,
