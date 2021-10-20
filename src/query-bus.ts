@@ -11,11 +11,11 @@ import {
   IQueryHandler,
   IQueryPublisher,
   IQueryResult,
+  Query,
 } from './interfaces';
 import { ObservableBus } from './utils/observable-bus';
-import { Class } from 'utility-types';
 
-type IQuery = Class<QueryInterface>;
+type IQuery = Type<QueryInterface>;
 export type QueryHandlerType<
   QueryBase extends IQuery = IQuery,
   QueryResultBase extends IQueryResult = IQueryResult,
@@ -42,6 +42,8 @@ export class QueryBus<QueryBase extends IQuery = IQuery>
     this._publisher = _publisher;
   }
 
+  execute<TResult>(query: Query<TResult>): Promise<TResult>;
+  execute<T extends QueryBase, TResult = any>(query: T): Promise<TResult>;
   async execute<T extends QueryBase, TResult = any>(
     query: T,
   ): Promise<TResult> {

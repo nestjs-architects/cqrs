@@ -22,6 +22,7 @@
     "@commitlint/config-angular": "13.2.0",
     "@nestjs/common": "8.1.1",
     "@nestjs/core": "8.1.1",
+    "@nestjs/testing": "^8.1.1",
     "@types/jest": "27.0.2",
     "@types/node": "16.0.1",
     "@typescript-eslint/eslint-plugin": "5.0.0",
@@ -59,8 +60,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/nestjs/cqrs"
-  },
-  "dependencies": {
-    "utility-types": "^3.10.0"
   }
 }
