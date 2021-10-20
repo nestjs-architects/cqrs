@@ -9,9 +9,11 @@ import {
   SAGA_METADATA,
 } from '../decorators/constants';
 import {
+  ICommand,
   ICommandHandler,
   IEvent,
   IEventHandler,
+  IQuery,
   IQueryHandler,
 } from '../interfaces';
 import { CqrsOptions } from '../interfaces/cqrs-options.interface';
@@ -22,10 +24,11 @@ export class ExplorerService<EventBase extends IEvent = IEvent> {
 
   explore(): CqrsOptions {
     const modules = [...this.modulesContainer.values()];
-    const commands = this.flatMap<ICommandHandler>(modules, (instance) =>
-      this.filterProvider(instance, COMMAND_HANDLER_METADATA),
+    const commands = this.flatMap<ICommandHandler<ICommand>>(
+      modules,
+      (instance) => this.filterProvider(instance, COMMAND_HANDLER_METADATA),
     );
-    const queries = this.flatMap<IQueryHandler>(modules, (instance) =>
+    const queries = this.flatMap<IQueryHandler<IQuery>>(modules, (instance) =>
       this.filterProvider(instance, QUERY_HANDLER_METADATA),
     );
     const events = this.flatMap<IEventHandler<EventBase>>(modules, (instance) =>

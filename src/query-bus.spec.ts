@@ -17,7 +17,7 @@ const getFixtures = () => {
   let module: TestingModule;
   let queryBus: QueryBus;
   return {
-    GivenThereIsOneQuery: async () => {
+    GivenThereIsOneCommand: async () => {
       module = await Test.createTestingModule({
         providers: [QueryBus, ExplorerService, SomeQueryHandler],
       }).compile();
@@ -27,7 +27,7 @@ const getFixtures = () => {
       const { queries } = explorer.explore();
       queryBus.register(queries);
     },
-    WhenTheQueryIsExecuted: async () => {
+    WhenTheCommandIsExecuted: async () => {
       return queryBus.execute(new SomeQuery());
     },
     ThenItShouldReturnTheResultFromHandler: (result) => {
@@ -40,8 +40,8 @@ describe('Query Bus', () => {
   const fixtures = getFixtures();
 
   it('should return the result from handler for the query', async () => {
-    await fixtures.GivenThereIsOneQuery();
-    const result = await fixtures.WhenTheQueryIsExecuted();
+    await fixtures.GivenThereIsOneCommand();
+    const result = await fixtures.WhenTheCommandIsExecuted();
     fixtures.ThenItShouldReturnTheResultFromHandler(result);
   });
 });

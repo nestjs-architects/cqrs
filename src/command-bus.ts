@@ -6,6 +6,7 @@ import { CommandHandlerNotFoundException } from './exceptions/command-not-found.
 import { DefaultCommandPubSub } from './helpers/default-command-pubsub';
 import { InvalidCommandHandlerException } from './exceptions/invalid-command-handler.exception';
 import {
+  Command,
   ICommand,
   ICommandBus,
   ICommandHandler,
@@ -36,6 +37,8 @@ export class CommandBus<CommandBase extends ICommand = ICommand>
     this._publisher = _publisher;
   }
 
+  execute<R = void>(query: Command<R>): Promise<R>;
+  execute<T extends CommandBase, R = any>(command: T): Promise<R>;
   execute<T extends CommandBase, R = any>(command: T): Promise<R> {
     const commandName = this.getCommandName(command as any);
     const handler = this.handlers.get(commandName);
