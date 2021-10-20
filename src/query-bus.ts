@@ -1,11 +1,12 @@
 import { Injectable, Type } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import 'reflect-metadata';
-import { QUERY_HANDLER_METADATA } from './decorators/constants';
+import { QUERY_HANDLER_METADATA, QUERY_METADATA } from './decorators/constants';
 import { QueryHandlerNotFoundException } from './exceptions';
 import { InvalidQueryHandlerException } from './exceptions/invalid-query-handler.exception';
 import { DefaultQueryPubSub } from './helpers/default-query-pubsub';
 import {
+  ICommand,
   IQuery as QueryInterface,
   IQueryBus,
   IQueryHandler,
@@ -14,6 +15,8 @@ import {
   Query,
 } from './interfaces';
 import { ObservableBus } from './utils/observable-bus';
+import { CommandMetadata } from './interfaces/commands/command-metadata.interface';
+import { QueryMetadata } from './interfaces/queries/query-metadata.interface';
 
 type IQuery = Type<QueryInterface>;
 export type QueryHandlerType<
@@ -47,10 +50,10 @@ export class QueryBus<QueryBase extends IQuery = IQuery>
   async execute<T extends QueryBase, TResult = any>(
     query: T,
   ): Promise<TResult> {
-    const queryName = this.getQueryName(query);
-    const handler = this.handlers.get(queryName);
+    const queryId = this.getQueryId(query.constructor as Type<QueryBase>);
+    const handler = this.handlers.get(queryId);
     if (!handler) {
-      throw new QueryHandlerNotFoundException(queryName);
+      throw new QueryHandlerNotFoundException(queryId);
     }
 
     this.subject$.next(query);
@@ -60,9 +63,9 @@ export class QueryBus<QueryBase extends IQuery = IQuery>
 
   bind<T extends QueryBase, TResult = any>(
     handler: IQueryHandler<T, TResult>,
-    name: string,
+    queryId: string,
   ) {
-    this.handlers.set(name, handler);
+    this.handlers.set(queryId, handler);
   }
 
   register(handlers: QueryHandlerType<QueryBase>[] = []) {
@@ -74,22 +77,32 @@ export class QueryBus<QueryBase extends IQuery = IQuery>
     if (!instance) {
       return;
     }
-    const target = this.reflectQueryName(handler);
+    const target = this.reflectQueryId(handler);
     if (!target) {
       throw new InvalidQueryHandlerException();
     }
-    this.bind(instance as IQueryHandler<QueryBase, IQueryResult>, target.name);
+    this.bind(instance as IQueryHandler<QueryBase, IQueryResult>, target);
   }
 
-  private getQueryName(query: QueryBase): string {
-    const { constructor } = Object.getPrototypeOf(query);
-    return constructor.name as string;
+  private getQueryId(query: Type<QueryBase>): string {
+    const queryMetadata: CommandMetadata = Reflect.getMetadata(
+      QUERY_METADATA,
+      query,
+    );
+
+    return queryMetadata.id;
   }
 
-  private reflectQueryName(
-    handler: QueryHandlerType<QueryBase>,
-  ): FunctionConstructor {
-    return Reflect.getMetadata(QUERY_HANDLER_METADATA, handler);
+  private reflectQueryId(handler: QueryHandlerType<QueryBase>): string {
+    const query: Type<ICommand> = Reflect.getMetadata(
+      QUERY_HANDLER_METADATA,
+      handler,
+    );
+    const queryMetadata: QueryMetadata = Reflect.getMetadata(
+      QUERY_METADATA,
+      query,
+    );
+    return queryMetadata.id;
   }
 
   private useDefaultPublisher() {
