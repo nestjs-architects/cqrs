@@ -11,7 +11,8 @@ import { ExplorerService } from './services/explorer.service';
   exports: [CommandBus, QueryBus, EventBus, EventPublisher],
 })
 export class CqrsModule<EventBase extends IEvent = IEvent>
-  implements OnApplicationBootstrap {
+  implements OnApplicationBootstrap
+{
   constructor(
     private readonly explorerService: ExplorerService<EventBase>,
     private readonly eventsBus: EventBus<EventBase>,

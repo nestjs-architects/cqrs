@@ -1,6 +1,9 @@
-name: nestjs-architects/cqrs PR workflow
+name: nestjs-architects/cqrs Master workflow
 
-on: pull_request
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   validate:

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { IEvent } from './interfaces';
+import { IEvent, IEventHandler } from './interfaces';
+import { Class } from 'utility-types';
 
 const INTERNAL_EVENTS = Symbol();
 const IS_AUTO_COMMIT_ENABLED = Symbol();
@@ -50,7 +51,7 @@ export abstract class AggregateRoot<EventBase extends IEvent = IEvent> {
 
   protected getEventHandler<T extends EventBase = EventBase>(
     event: T,
-  ): Function | undefined {
+  ): Class<IEventHandler> | undefined {
     const handler = `on${this.getEventName(event)}`;
     return this[handler];
   }
