@@ -6,23 +6,26 @@ import { QueryHandlerNotFoundException } from './exceptions';
 import { InvalidQueryHandlerException } from './exceptions/invalid-query-handler.exception';
 import { DefaultQueryPubSub } from './helpers/default-query-pubsub';
 import {
-  IQuery,
+  IQuery as QueryInterface,
   IQueryBus,
   IQueryHandler,
   IQueryPublisher,
   IQueryResult,
 } from './interfaces';
 import { ObservableBus } from './utils/observable-bus';
+import { Class } from 'utility-types';
 
+type IQuery = Class<QueryInterface>;
 export type QueryHandlerType<
   QueryBase extends IQuery = IQuery,
-  QueryResultBase extends IQueryResult = IQueryResult
+  QueryResultBase extends IQueryResult = IQueryResult,
 > = Type<IQueryHandler<QueryBase, QueryResultBase>>;
 
 @Injectable()
 export class QueryBus<QueryBase extends IQuery = IQuery>
   extends ObservableBus<QueryBase>
-  implements IQueryBus<QueryBase> {
+  implements IQueryBus<QueryBase>
+{
   private handlers = new Map<string, IQueryHandler<QueryBase, IQueryResult>>();
   private _publisher: IQueryPublisher<QueryBase>;
 
@@ -42,7 +45,7 @@ export class QueryBus<QueryBase extends IQuery = IQuery>
   async execute<T extends QueryBase, TResult = any>(
     query: T,
   ): Promise<TResult> {
-    const queryName = this.getQueryName((query as any) as Function);
+    const queryName = this.getQueryName(query);
     const handler = this.handlers.get(queryName);
     if (!handler) {
       throw new QueryHandlerNotFoundException(queryName);
@@ -76,7 +79,7 @@ export class QueryBus<QueryBase extends IQuery = IQuery>
     this.bind(instance as IQueryHandler<QueryBase, IQueryResult>, target.name);
   }
 
-  private getQueryName(query: Function): string {
+  private getQueryName(query: QueryBase): string {
     const { constructor } = Object.getPrototypeOf(query);
     return constructor.name as string;
   }

@@ -12,13 +12,15 @@ import {
   ICommandPublisher,
 } from './interfaces/index';
 import { ObservableBus } from './utils/observable-bus';
+import { Class } from 'utility-types';
 
 export type CommandHandlerType = Type<ICommandHandler<ICommand>>;
 
 @Injectable()
 export class CommandBus<CommandBase extends ICommand = ICommand>
   extends ObservableBus<CommandBase>
-  implements ICommandBus<CommandBase> {
+  implements ICommandBus<CommandBase>
+{
   private handlers = new Map<string, ICommandHandler<CommandBase>>();
   private _publisher: ICommandPublisher<CommandBase>;
 
@@ -65,7 +67,7 @@ export class CommandBus<CommandBase extends ICommand = ICommand>
     this.bind(instance as ICommandHandler<CommandBase>, target.name);
   }
 
-  private getCommandName(command: Function): string {
+  private getCommandName(command: Class<ICommand>): string {
     const { constructor } = Object.getPrototypeOf(command);
     return constructor.name as string;
   }
