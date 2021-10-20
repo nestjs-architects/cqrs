@@ -1,5 +1,6 @@
-import { IQuery } from './query.interface';
+import { Query } from './query';
 
-export interface IQueryHandler<T extends IQuery = any, TRes = any> {
-  execute(query: T): Promise<TRes>;
-}
+export type IQueryHandler<QueryType extends Query<unknown> = Query<unknown>> =
+  QueryType extends Query<infer ResultType>
+    ? { execute(query: QueryType): Promise<ResultType> }
+    : never;

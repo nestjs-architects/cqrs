@@ -8,7 +8,7 @@ export class ObservableBus<T> extends Observable<T> {
     this.source = this._subject$;
   }
 
-  public get subject$() {
+  protected get subject$() {
     return this._subject$;
   }
 }

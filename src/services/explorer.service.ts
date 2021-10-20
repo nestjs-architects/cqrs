@@ -13,6 +13,7 @@ import {
   IEvent,
   IEventHandler,
   IQueryHandler,
+  Query,
 } from '../interfaces';
 import { CqrsOptions } from '../interfaces/cqrs-options.interface';
 
@@ -25,8 +26,9 @@ export class ExplorerService<EventBase extends IEvent = IEvent> {
     const commands = this.flatMap<ICommandHandler>(modules, (instance) =>
       this.filterProvider(instance, COMMAND_HANDLER_METADATA),
     );
-    const queries = this.flatMap<IQueryHandler>(modules, (instance) =>
-      this.filterProvider(instance, QUERY_HANDLER_METADATA),
+    const queries = this.flatMap<IQueryHandler<Query<unknown>>>(
+      modules,
+      (instance) => this.filterProvider(instance, QUERY_HANDLER_METADATA),
     );
     const events = this.flatMap<IEventHandler<EventBase>>(modules, (instance) =>
       this.filterProvider(instance, EVENTS_HANDLER_METADATA),

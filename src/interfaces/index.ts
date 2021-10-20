@@ -11,5 +11,5 @@ export * from './queries/query-bus.interface';
 export * from './queries/query-handler.interface';
 export * from './queries/query-publisher.interface';
 export * from './queries/query-result.interface';
-export * from './queries/query.interface';
+export * from './queries/query';
 export * from './saga.type';

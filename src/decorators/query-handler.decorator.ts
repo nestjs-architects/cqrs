@@ -1,6 +1,7 @@
 import 'reflect-metadata';
-import { IQuery } from '../interfaces';
+import { Query } from '../interfaces';
 import { QUERY_HANDLER_METADATA } from './constants';
+import { Type } from '@nestjs/common';
 
 /**
  * Decorator that marks a class as a Nest query handler. A query handler
@@ -12,7 +13,7 @@ import { QUERY_HANDLER_METADATA } from './constants';
  *
  * @see https://docs.nestjs.com/recipes/cqrs#queries
  */
-export const QueryHandler = (query: IQuery): ClassDecorator => {
+export const QueryHandler = (query: Type<Query<unknown>>): ClassDecorator => {
   return (target: object) => {
     Reflect.defineMetadata(QUERY_HANDLER_METADATA, query, target);
   };
