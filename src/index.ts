@@ -1,10 +1,3 @@
-/*
- * Nest CQRS Module
- * Copyright(c) 2017-... Kamil Mysliwiec
- * www.kamilmysliwiec.com
- * MIT Licensed
- */
-
 export * from './aggregate-root';
 export * from './command-bus';
 export * from './cqrs.module';

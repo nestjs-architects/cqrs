@@ -1,9 +1,9 @@
 {
-  "name": "@nestjs/cqrs",
+  "name": "@nestjs-architects/cqrs",
   "version": "8.0.0",
-  "description": "A lightweight CQRS module for Nest framework (node.js)",
+  "description": "Extended CQRS module for NestJS framework",
   "license": "MIT",
-  "url": "https://github.com/nestjs/cqrs#readme",
+  "url": "https://github.com/nestjs-architects/cqrs#readme",
   "scripts": {
     "test": "jest",
     "build": "tsc -p tsconfig.json",
@@ -62,6 +62,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nestjs/cqrs"
+    "url": "https://github.com/nestjs-architects/cqrs"
   }
 }
