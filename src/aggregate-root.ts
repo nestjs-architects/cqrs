@@ -53,6 +53,8 @@ export abstract class AggregateRoot<EventBase extends IEvent = IEvent> {
     event: T,
   ): Type<IEventHandler> | undefined {
     const handler = `on${this.getEventName(event)}`;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore idk what is that for
     return this[handler];
   }
 

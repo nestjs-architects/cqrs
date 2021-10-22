@@ -32,7 +32,7 @@ export class EventBus<EventBase extends IEvent = IEvent>
   protected getEventId: (event: EventBase) => string;
   protected readonly subscriptions: Subscription[];
 
-  private _publisher: IEventPublisher<EventBase>;
+  private _publisher!: IEventPublisher<EventBase>;
 
   constructor(
     private readonly commandBus: CommandBus,
@@ -56,11 +56,11 @@ export class EventBus<EventBase extends IEvent = IEvent>
     this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 
-  publish<T extends EventBase>(event: T) {
+  publish<T extends EventBase>(event: T): any {
     return this._publisher.publish(event);
   }
 
-  publishAll<T extends EventBase>(events: T[]) {
+  publishAll<T extends EventBase>(events: T[]): any {
     if (this._publisher.publishAll) {
       return this._publisher.publishAll(events);
     }
@@ -74,14 +74,19 @@ export class EventBus<EventBase extends IEvent = IEvent>
   }
 
   registerSagas(types: Type<unknown>[] = []) {
-    const sagas = types
+    const sagas: ISaga[] = types
       .map((target) => {
         const metadata = Reflect.getMetadata(SAGA_METADATA, target) || [];
-        const instance = this.moduleRef.get(target, { strict: false });
+        const instance: Record<string, ISaga> = this.moduleRef.get(target, {
+          strict: false,
+        });
         if (!instance) {
           throw new InvalidSagaException();
         }
-        return metadata.map((key: string) => instance[key].bind(instance));
+        return metadata.map((key: string) => {
+          const sagaFunction: ISaga = instance[key];
+          sagaFunction.bind(instance);
+        });
       })
       .reduce((a, b) => a.concat(b), []);
 

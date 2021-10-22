@@ -27,7 +27,7 @@ export class CommandBus<CommandBase extends ICommand = ICommand>
   implements ICommandBus<CommandBase>
 {
   private handlers = new Map<string, ICommandHandler<CommandBase>>();
-  private _publisher: ICommandPublisher<CommandBase>;
+  private _publisher!: ICommandPublisher<CommandBase>;
 
   constructor(private readonly moduleRef: ModuleRef) {
     super();
@@ -59,7 +59,9 @@ export class CommandBus<CommandBase extends ICommand = ICommand>
       const commandName = reflectCommandName(
         handler.constructor as CommandHandlerType,
       );
-      throw new CommandHandlerAlreadyAssignedException(commandName);
+      // as we already have commandId then commandName should be reachable
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      throw new CommandHandlerAlreadyAssignedException(commandName!);
     }
     this.handlers.set(commandId, handler);
   }

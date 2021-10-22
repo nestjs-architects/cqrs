@@ -13,12 +13,12 @@ import {
   Query,
 } from './interfaces';
 import { ObservableBus } from './utils/observable-bus';
-import { CommandHandlerAlreadyAssignedException } from './exceptions/command-handler-already-assigned.exception';
 import {
   getQueryId,
   reflectQueryId,
   reflectQueryName,
 } from './helpers/reflect-query-bus';
+import { QueryHandlerAlreadyAssignedException } from './exceptions/query-handler-already-assigned.exception';
 
 type IQuery = Type<QueryInterface>;
 export type QueryHandlerType<
@@ -32,7 +32,7 @@ export class QueryBus<QueryBase extends IQuery = IQuery>
   implements IQueryBus<QueryBase>
 {
   private handlers = new Map<string, IQueryHandler<QueryBase, IQueryResult>>();
-  private _publisher: IQueryPublisher<QueryBase>;
+  private _publisher!: IQueryPublisher<QueryBase>;
 
   constructor(private readonly moduleRef: ModuleRef) {
     super();
@@ -71,7 +71,9 @@ export class QueryBus<QueryBase extends IQuery = IQuery>
       const queryName = reflectQueryName(
         handler.constructor as QueryHandlerType,
       );
-      throw new CommandHandlerAlreadyAssignedException(queryName);
+      // as we already have commandId then commandName should be reachable
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      throw new QueryHandlerAlreadyAssignedException(queryName!);
     }
     this.handlers.set(queryId, handler);
   }

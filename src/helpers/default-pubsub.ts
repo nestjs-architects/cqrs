@@ -10,7 +10,7 @@ export class DefaultPubSub<EventBase extends IEvent>
     this.subject$.next(event);
   }
 
-  bridgeEventsTo<T extends EventBase>(subject: Subject<T>) {
+  bridgeEventsTo(subject: Subject<EventBase>) {
     this.subject$ = subject;
   }
 }

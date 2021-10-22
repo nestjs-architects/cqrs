@@ -64,7 +64,7 @@ export class ExplorerService<EventBase extends IEvent = IEvent> {
   extractMetadata(
     instance: Record<string, any>,
     metadataKey: string,
-  ): Type<any> {
+  ): Type<any> | undefined {
     if (!instance.constructor) {
       return;
     }
